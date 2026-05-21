@@ -34,4 +34,4 @@ output.exe > image.ppm
 
 
 
--Inspired from the book ```Ray Tracer in a Week```
+-Inspired from the book ```Ray Tracing in a Weekend```
