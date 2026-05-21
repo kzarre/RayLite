@@ -25,3 +25,13 @@ cd RayLite
 g++ -o output.exe main.cpp
 output.exe > image.ppm
 ```
+
+### Screenshots
+
+![Demonstration of the final thing](https://github.com/kzarre/RayLite/blob/main/screenshots/screenshot1.png)
+
+![Demonstration of the materials](https://github.com/kzarre/RayLite/blob/main/screenshots/screenshot2.png)
+
+
+
+-Inspired from the book ```Ray Tracer in a Week```
