@@ -9,6 +9,7 @@
 - Sphere rendering with simple material system
 - Optimized for low memory usage and speed
 - Outputs rendered image as a `.ppm` file
+- Implemented multiprocessing using openMP for faster rendering
 
 
 ## How to Run
@@ -32,6 +33,3 @@ output.exe > image.ppm
 
 ![Demonstration of the materials](https://github.com/kzarre/RayLite/blob/main/screenshots/screenshot2.png)
 
-
-
--Inspired from the book ```Ray Tracing in a Weekend```
