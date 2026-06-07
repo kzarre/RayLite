@@ -1,5 +1,7 @@
 # RayLite — Lightweight Ray Tracer in C++
 
+![Demonstration of the materials](https://github.com/kzarre/RayLite/blob/main/screenshots/screenshot2.png)
+
 **RayLite** is a minimal and efficient ray tracer written from scratch in C++. It implements fundamental ray tracing concepts including lighting, shading, and reflections, with a focus on performance and clarity.
 
 ## Features
@@ -30,6 +32,4 @@ output.exe > image.ppm
 ### Screenshots
 
 ![Demonstration of the final thing](https://github.com/kzarre/RayLite/blob/main/screenshots/screenshot1.png)
-
-![Demonstration of the materials](https://github.com/kzarre/RayLite/blob/main/screenshots/screenshot2.png)
 
