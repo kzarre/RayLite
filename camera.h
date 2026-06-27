@@ -3,8 +3,13 @@
 
 #include "hittable.h"
 #include "material.h"
+#include "tile.h"
+#include "window.h"
 #include <omp.h>
 #include <vector>
+#include <atomic>
+
+
 
 class camera {
     public:
@@ -29,38 +34,67 @@ class camera {
             initialize();
 
             framebuffer.resize(image_width * image_height);
-            int scanlines_done = 0;
-            std::cout << "P3\n" << image_width << ' ' << image_height <<"\n255\n";
+
+            Window win(image_width, image_height);
+
+            const int tile_size = 32;
+            std::vector<Tile> tiles;
+            for (int j = 0; j<image_height; j+= tile_size){
+                for (int i=0; i<image_width; i+=tile_size){
+                    tiles.push_back({i,j,
+                    std::min(tile_size, image_width - i),
+                    std::min(tile_size, image_height-j)
+                });
+                }
+            }
+
+            std::atomic<int> tiles_done = 0;
+            
 
             #pragma omp parallel for schedule(dynamic)  
-            for (int j = 0; j < image_height; j++){
-                
-                #pragma omp atomic
-                scanlines_done++;
-                
-                #pragma omp critical
-                std::clog << "\rScanlines remaining: " << (image_height - scanlines_done) << ' ' << std::flush;
-                
-                for(int i = 0; i < image_width;  i++){
+            for (int t=0; t<tiles.size(); t++){
+                const Tile& tile = tiles[t];
+                for (int j = tile.y; j < tile.y + tile.height; j++){
+                    
+                    // #pragma omp atomic
+                    // scanlines_done++;
+                    
+                    // #pragma omp critical
+                    // std::clog << "\rScanlines remaining: " << (image_height - scanlines_done) << ' ' << std::flush;
+                    
+                    for(int i = tile.x; i < tile.x + tile.width;  i++){
 
-                    color pixel_color(0,0,0);
-                    for (int sample = 0; sample < samples_per_pixel; sample++) {
-                        ray r = get_ray(i, j);
-                        pixel_color += ray_color(r, max_depth, world);
-                        
+                        color pixel_color(0,0,0);
+                        for (int sample = 0; sample < samples_per_pixel; sample++) {
+                            ray r = get_ray(i, j);
+                            pixel_color += ray_color(r, max_depth, world);
+                        }
+                        // write_color(std::cout, pixel_samples_scale * pixel_color);
+                        framebuffer[j * image_width + i] = pixel_color;
+                        win.set_pixel(i, j, pixel_color, pixel_samples_scale);
                     }
-
-                    // write_color(std::cout, pixel_samples_scale * pixel_color);
-                    framebuffer[j * image_width + i] = pixel_color;
                 }
+
+                #pragma omp critical
+                {
+                    win.update_tile(tile.x, tile.y, tile.width, tile.height);
+                    int data = ++tiles_done;
+                    std::clog << "\rTiles: " << data << "/" << tiles.size() << std::flush;
+                }
+
+            
+
             }
 
-            for (int j = 0; j < image_height; j++){
-                for (int i = 0; i < image_width; i++){
-                    write_color(std::cout, pixel_samples_scale * framebuffer[j*image_width+i]);
-                }
-            }
-                std::clog << "\rDone.                     \n";
+            // std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+            // for (int j = 0; j < image_height; j++){
+            //     for (int i = 0; i < image_width; i++){
+            //         write_color(std::cout, pixel_samples_scale * framebuffer[j*image_width+i]);
+            //     }
+            // }
+                std::clog << "\rDone.\n";
+
+                win.wait_for_close();
         }
 
     private:
